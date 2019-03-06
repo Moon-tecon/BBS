@@ -1,0 +1,14 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}添加小组{% endblock %}
+
+{% block admin_content %}
+    <div class="card w-100 bg-light">
+        <h1 class="card-header">添加小组</h1>
+        <div class="card-body">
+            {{ render_form(form) }}
+        </div>
+        <small>带*为必填项</small>
+    </div>
+{% endblock %}

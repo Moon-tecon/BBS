@@ -1,0 +1,47 @@
+{% extends 'user/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}已订阅的主题{% endblock %}
+
+{% block user_content %}
+    {% if notices %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th>组</th>
+                <th><span class="oi oi-clock"></span></th>
+                <th><span class="oi oi-wrench"></span> </th>
+            </tr>
+            </thead>
+            {% for notice in notices %}
+                <tr>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=notice.noticed_id) }}">
+                        {{ notice.noticed.name }}</a><br>
+                        由<a href="{{ url_for('user.index', username=notice.noticed.author.username) }}">
+                            {{ notice.noticed.author.username }}</a>发布</td>
+                    <td><a href="{{ url_for('main.show_group', group_id=notice.noticed.group_id) }}">
+                        {{ notice.noticed.group.name }}</a></td>
+                    <td class="text-muted">
+                        {{ moment(notice.timestamp).format('llll')}}
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('main.unnotice', topic_id=notice.noticed.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                <span class="oi oi-x"></span> 取消订阅
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% else %}
+        <div class="tip text-center">
+            <p class="text-muted">暂无内容</p>
+        </div>
+    {% endif %}
+{% endblock %}

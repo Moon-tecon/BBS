@@ -1,0 +1,141 @@
+{% extends 'main/basic.html' %}
+{% from 'macros.html' import file_display with context %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}{{ topic.name }}{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <p><span class="oi oi-home text-muted"></span>
+            <a href="{{ url_for('main.index')}}" class="text-dark text-muted">论坛首页</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_group', group_id=topic.group_id) }}" class="text-dark text-muted">
+                {{ topic.group.name }}</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_topic', topic_id=topic.id) }}" class="text-dark text-muted">
+                {{ topic.name }}</a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block base_content %}
+    <div class="page-header">
+        {% if current_user.can('MODERATE')%}
+            <a data-toggle="modal" data-target="#migrate_form" href="#!"
+                   data-href="{{ url_for('admin.migrate_topic', topic_id=topic.id) }}"
+                   class="btn btn-sm btn-outline-primary float-right">迁移主题</a>
+        {% endif %}
+        <h1 class="text-center">{{ topic.name }}</h1>
+        <span class="float-right">帖子<span class="badge badge-info">{{ pagination.total+ 1 }}</span></span>
+        {% if topic.group.status_id !=2 or current_user.can('MEMBER') %}
+            <a href="{{ url_for('main.new_post', topic_id=topic.id)}}" class="btn btn-primary float-left btn-sm">
+                <span class="oi oi-share"></span>回帖</a>&nbsp;&nbsp;
+        {% endif %}
+        <div class="dropdown nav-item float-left">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+               aria-expanded="false">
+                <span class="oi oi-ellipses"></span>
+            </a>
+            <div class="dropdown-menu" role="menu">
+                {% if current_user==topic.group.admin or current_user.can('MODERATE') or current_user==topic.author%}
+                    <button data-toggle="modal" data-target="#confirm-delete" href="#!"
+                           data-href="{{ url_for('main.delete_topic', topic_id=topic.id,
+                           next=url_for('main.show_group', group_id=topic.group_id)) }}"
+                            class="dropdown-item text-danger">
+                        <span class="oi oi-x"></span> 删除主题</button>
+                {% endif %}
+                {% if current_user==topic.group.admin or current_user.can('MODERATE') %}
+                    {% if topic.top %}
+                        <form method="post" action="{{ url_for('main.cancel_top_topic', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item text-muted">
+                                <span class="oi oi-arrow-thick-bottom"></span> 取消置顶
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ url_for('main.top_topic', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item text-success">
+                                <span class="oi oi-arrow-thick-top"></span> 置顶主题
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                    {% if  not current_user.is_noticing(topic) %}
+                        <form method="post" action="{{ url_for('main.notice', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item">
+                                <span class="oi oi-envelope-closed"></span> 订阅主题
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ url_for('main.unnotice', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item">
+                                <span class="oi oi-trash"></span> 取消订阅
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if not current_user.is_collecting(topic) %}
+                        <form method="post" action="{{ url_for('main.collect', topic_id=topic.id) }}" class="inline float-left">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item text-info">
+                                <span class="oi oi-star"></span> 收藏主题
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" class="inline float-left"
+                              action="{{ url_for('main.uncollect', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item text-muted">
+                                <span class="oi oi-x"></span> 取消收藏
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <form method="post" action="{{ url_for('main.notice', topic_id=topic.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="dropdown-item">
+                            <span class="oi oi-envelope-closed"></span> 订阅主题
+                        </button>
+                    </form>
+                    <form method="post" action="{{ url_for('main.collect', topic_id=topic.id) }}" class="inline float-left">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="dropdown-item text-info">
+                            <span class="oi oi-star"></span> 收藏主题
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        <br>
+    </div>
+    {% include 'main/_topic.html' %}
+    {% if posts %}
+        {% for post in posts %}
+            {% include'main/_post.html' %}
+        {% endfor %}
+         <div class="page-footer">{{ render_pagination(pagination, align='center') }}</div>
+    {% endif %}
+    <!--migrate_form-->
+    <div class="modal fade" id="migrate_form" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>迁移主题</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" class="migrate_form" method="post">
+                        {{ form.csrf_token }}
+                        {{ render_field(form.group) }}
+                        {{ render_field(form.submit, class='btn btn-info float-right') }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

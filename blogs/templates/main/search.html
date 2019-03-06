@@ -1,0 +1,65 @@
+{% extends'main/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}搜索{{ q }}{% endblock %}
+
+{% block base_content %}
+    <div class="page-header">
+        <h2>搜索：{{ q }}</h2>
+    </div>
+    <div class="nav nav-tabs" role="tablist">
+        <a class="nav-item nav-link {% if category == 'topic' %}active{% endif %}"
+           href="{{ url_for('main.search', q=q, category='topic') }}">主题</a>
+        <a class="nav-item nav-link {% if category == 'post' %}active{% endif %}"
+           href="{{ url_for('main.search', q=q, category='post') }}">帖子</a>
+        <a class="nav-item nav-link {% if category == 'user' %}active{% endif %}"
+           href="{{ url_for('main.search', q=q, category='user') }}">用户</a>
+    </div>
+    {% if results %}
+        <h3>{{ results|length }}<small>条搜索结果</small></h3>
+        {% for item in results %}
+            {% if category == 'topic' %}
+                <div class="list-card">
+                    <div class="card border-primary">
+                        <h5 class="card-title"><a href="{{ url_for('main.show_topic', topic_id=item.id) }}">
+                            {{ item.name }}</a> </h5>
+                        <p class="card-text">{{ item.body|striptags|truncate(80,ture,'......') }}</p>
+                        <p class="text-muted">
+                            <a href="{{ url_for('user.index', username=item.author.username)}}" class="profile-popover"
+                               data-href="{{ url_for('ajax.get_profile', user_id=item.author_id)}}">
+                            {{ item.author.username }}
+                            </a> &nbsp;
+                            <small>{{ moment(item.timestamp).format('lll')}}</small>
+                        </p>
+                    </div>
+                </div>
+            {% elif category == 'post' %}
+                <div class="list-card">
+                    <div class="card border-primary">
+                        <h5 class="card-title">
+                            <a href="{{ url_for('main.show_post', post_id=item.id) }}">{{ item.title }}</a></h5>
+                        <p>{{ item.body|striptags|truncate(80,ture,'......') }}</p>
+                        <p class="text-muted">
+                            <a href="{{ url_for('user.index', username=item.author.username)}}" class="profile-popover"
+                               data-href="{{ url_for('ajax.get_profile', user_id=item.author_id)}}">
+                                {{ item.author.username }}</a>&nbsp;
+                            <small>{{ moment(item.timestamp).format('lll')}}</small></p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card user-card">
+                    <a href="{{ url_for('user.index', username=item.username) }}">
+                        <img src="{{ url_for('main.get_avatar', filename=item.avatar_m) }}" class="rounded avatar-m">
+                    </a>
+                    <a href="{{ url_for('user.index', username=item.username) }}">{{ item.username }}</a>
+                    {% if current_user.can('MEMBER') %}({{ item.name }}){% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <h5 class="tip">无结果</h5>
+    {% endif %}
+    {% if results %}
+        <div class="up-20">{{ render_pagination(pagination, align='right') }}</div>
+    {% endif %}
+{% endblock %}

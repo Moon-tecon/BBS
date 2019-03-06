@@ -1,0 +1,6 @@
+<p>{{ receiver.username }}您好：</p>
+<p>{{ user.username }}在您关注的
+    <a href="{{ url_for('main.show_topic', topic_id=topic.id,  _external=True) }}">{{ topic.name }}</a>回复了新的帖子。
+</p>
+
+<small>(请不要回复此通知邮件）</small>

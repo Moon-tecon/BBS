@@ -1,0 +1,3 @@
+管理员，你好:
+{{ user.username }}申请加入公司论坛,请访问下面的连接管理用户的申请:
+    {{ url_for('admin.manage_user', filter='unconfirm', _external=True) }}

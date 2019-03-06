@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+{% block content %}
+    <div class="page-header">
+        <h3>后台管理</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-2 bg-light">
+            <div class="nav nav-pills flex-column" role="tablist" aria-orientation="vertical">
+                {{ render_nav_item('admin.manage_user', '管理用户', filter='confirmed') }}
+                {{ render_nav_item('admin.manage_group', '管理组') }}
+                {{ render_nav_item('admin.new_user', '添加用户') }}
+                {{ render_nav_item('admin.new_group', '添加组') }}
+                {{ render_nav_item('admin.reported_posts', '被举报的帖子')}}
+                {{ render_nav_item('admin.reported_topics', '被举报的主题')}}
+            </div>
+        </div>
+        <div class="col-md-10">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

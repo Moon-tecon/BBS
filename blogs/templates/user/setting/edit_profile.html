@@ -1,0 +1,17 @@
+{% extends 'user/setting/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}编辑基本信息{% endblock %}
+
+{% block setting_content %}
+    <div class="card w-100 bg-light">
+        <h3 class="card-header">编辑基本信息</h3>
+        <div class="card-body">
+            {{ render_form(form, extra_classes='col-6') }}
+            <h5><span class="oi oi-envelope-closed "></span> {{ current_user.email }}&nbsp;&nbsp;
+                <a href="{{ url_for('user.change_email_request') }}" class="small">更改邮箱</a>
+            </h5>
+        </div>
+        <small class="text-muted">带*为必填项</small>
+    </div>
+{% endblock %}

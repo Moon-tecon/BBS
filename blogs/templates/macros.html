@@ -1,0 +1,103 @@
+{% macro file_area(file) %}
+    <div class="fileMessage">
+        <a href="{{ url_for('main.get_file', filename=file.filename)}}">{{ file.filename }}</a><br>
+        <p class="small">
+            <a href="{{ url_for('main.get_file', filename=file.filename)}}" class="text-dark"
+              download="{{ filename}}"><span class="oi oi-data-transfer-download"></span>下载</a>&nbsp;&nbsp;
+            <a href="{{ url_for('main.get_file', filename=file.filename)}}" target="_blank" class="text-dark">
+                <span class="oi oi-list"></span>详情</a>&nbsp;&nbsp;
+            {% if current_user==file.post.author or current_user.can('MODERATE') or current_user==file.topic.author%}
+                <a data-toggle="modal" data-target="#confirm-delete" href="#!"
+                    data-href="{{ url_for('main.delete_file', file_id=file.id, next=request.full_path) }}" class="text-danger">
+                    <small class="oi oi-circle-x"></small>删除</a>
+            {% endif %}
+        </p>
+        <div class="clear_float"></div>
+    </div>
+{% endmacro %}
+
+{% macro file_display(file) %}
+    {% if file.filename.rsplit('.', 1)[1] in ['jpg', 'png', 'jpeg', 'gif', 'PNG', 'bmp'] %}
+        {{ photo_card(file) }}
+    {% elif file.filename.rsplit('.', 1)[1] in ['txt', 'log'] %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/txt.png') }}" class="float-left">
+            {{ file_area(file)}}
+        </div>
+    {% elif file.filename.rsplit('.', 1)[1] in ['xlsx', 'xls'] %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/xlsx.png') }}" class="float-left">
+            {{ file_area(file) }}
+        </div>
+    {% elif file.filename.rsplit('.', 1)[1] in ['docx', 'doc'] %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/docx.png') }}" class="float-left">
+            {{ file_area(file) }}
+        </div>
+    {% elif file.filename.rsplit('.', 1)[1] in ['pdf'] %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/pdf.png') }}" class="float-left">
+            {{ file_area(file) }}
+        </div>
+    {% elif file.filename.rsplit('.', 1)[1] in ['rar', 'zip', 'arj', 'gz', 'z'] %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/rar.png') }}" class="float-left">
+            {{ file_area(file) }}
+        </div>
+    {% else %}
+        <div>
+            <img src="{{ url_for('static', filename='imgs/apk.png') }}" class="float-left">
+            {{ file_area(file) }}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro index_group(group) %}
+    <tr>
+        <td><a href="{{ url_for('main.show_group', group_id=group.id) }}">
+            <strong>{{ group.name }}</strong></a> <br>
+            {{ group.intro|striptags|truncate(100,ture,'......') }}
+        </td>
+        <td>{{ group.get_topic_count() }}</td>
+        <td>{{ group.get_post_count() }}</td>
+        <td>{% if not group.get_last_topic() %}
+            <div class="text-muted">还没发布主题</div>
+            {% elif not group.get_last_post() or group.last_topic_sign()>=group.last_post_sign() %}
+                <a href="{{ url_for('main.show_topic', topic_id=group.get_last_topic().id) }}">
+                    {{ group.get_last_topic().name }}
+                </a><br>
+                <span class="text-muted"> 由
+                    <a href="{{ url_for('user.index', username=group.get_last_topic().author.username) }}"
+                       class="profile-popover" data-href="{{ url_for('ajax.get_profile',
+                       user_id=group.get_last_topic().author_id) }}">
+                        {{group.get_last_topic().author.username }}
+                    </a> 发布<br>
+                {{ moment(group.get_last_topic().timestamp).format('llll') }}</span>
+            {% else %}
+                <a href="{{ url_for('main.show_topic', topic_id=group.get_last_post().topic_id)}}">
+                   {{ group.get_last_post().title }}</a> <br>
+                <span class="text-muted"> 由
+                    <a href="{{ url_for('user.index', username=group.get_last_post().author.username) }}"
+                       class="profile-popover" data-href="{{ url_for('ajax.get_profile',
+                       user_id=group.get_last_post().author.id) }}">
+                        {{group.get_last_post().author.username }}
+                    </a> 发布<br>
+                {{ moment(group.get_last_post().timestamp).format('llll') }}</span>
+            {% endif %}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro photo_card(photo) %}
+    <div class="card photo_card">
+        <a href="{{ url_for('main.get_file', filename=photo.filename) }}" target="_blank">
+            <img src="{{ url_for('main.get_file', filename=photo.filename_s)}}"></a>
+        <div class="card-text small">
+            <a href="{{ url_for('main.get_file', filename=photo.filename) }}" target="_blank">查看原图</a>&nbsp;&nbsp;
+            {% if current_user==photo.post.author or current_user.can('MODERATE') or current_user==photo.topic.author %}
+                <a data-toggle="modal" data-target="#confirm-delete" href="#!"
+                    data-href="{{ url_for('main.delete_file', file_id=photo.id, next=request.full_path) }}" class="text-danger">删除</a>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

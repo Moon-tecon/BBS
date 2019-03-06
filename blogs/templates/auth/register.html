@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}注册账号{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-md-8">
+                <img src="{{ url_for('static', filename='imgs/Logo.jpg') }}" class="rounded img-fluid">
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-3 w-100 bg-light">
+                    <div class="card-header"><h5>欢迎来到<b>泰科</b>论坛</h5></div>
+                    <div class="card-body">
+                        {{ render_form(form) }}
+                        <hr>
+                        <small>已经有账号了？ <a href="{{ url_for('.login') }}">登录</a>
+                        </small>
+                    </div>
+                    <small>带*为必填项</small>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

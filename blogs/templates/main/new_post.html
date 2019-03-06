@@ -1,0 +1,42 @@
+{% extends'main/basic.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}回复{{ topic.name }}{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <p><span class="oi oi-home text-muted"></span>
+            <a href="{{ url_for('main.index')}}" class="text-dark text-muted">论坛首页</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_group', group_id=topic.group_id) }}" class="text-dark text-muted">
+                {{ topic.group.name }}</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_topic', topic_id=topic.id) }}" class="text-dark text-muted">
+                {{ topic.name }}</a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block base_content %}
+    <div class="card w-100 bg-light">
+        <h4 class="card-header">回复({{ topic.name }})</h4>
+        <div class="card-body">
+            <form action="{{ url_for('main.new_post', topic_id=topic.id) }}" method="post">
+                {{ form.csrf_token }}
+                {{ render_field(form.title) }}
+                {{ render_field(form.body) }}
+                {{ render_field(form.notice) }}
+                {{ render_field(form.publish, class='btn btn-outline-success float-right') }}
+                {{ render_field(form.save, class='btn btn-outline-primary float-right') }}
+                {{ render_field(form.save1, class='btn btn-outline-primary float-left') }}
+            </form>
+            <small class="text-muted">上传附件前，请保证标题及内容非空</small>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+    {{ ckeditor.config(name='body') }}
+{% endblock %}

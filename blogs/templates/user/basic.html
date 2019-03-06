@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1 class="page-header">{{ user.username }}的个人主页</h1>{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-3">
+            <a href="{% if current_user == user %}{{ url_for('.change_avatar') }}{% else %}#{% endif %}"
+               title="更换头像">
+                <img class="img-fluid rounded avatar-xl"
+                     src="{{ url_for('main.get_avatar', filename=user.avatar_l) }}">
+            </a>
+            <h3>{{ user.username }}
+                <small class="text-muted">
+                    {% if user.name %}
+                        {% if current_user.can('MEMBER') or user==current_user %}
+                            ({{ user.name }})
+                        {% endif %}
+                    {% endif %}
+                    {% if user.is_admin %}
+                        <span class="text-danger small">管理员</span>
+                    {% endif %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.edit_profile_admin', username=user.username) }}"
+                           class="btn btn-outline-primary btn-sm">编辑</a>
+                    {% endif %}
+                </small>
+            </h3>
+            <p>
+                主题：{{ user.publish_topic_count() }}<br>
+                邮箱：<a href="mailto:{{ user.email }}">{{ user.email }}</a><br>
+                {% if current_user.can('MEMBER') or current_user==user %}
+                    {% if user.phone %}手机：{{ user.phone }}<br>{% endif %}
+                    {% if user.company %}公司：{{ user.company }}{% endif %}
+                {% endif %}
+            </p>
+            {% if current_user == user %}
+                <p><a class="btn btn-primary btn-sm" href="{{ url_for('user.edit_profile')}}">
+                    <span class="oi oi-pencil"></span> 个人设置</a>&nbsp;
+                    <a href="{{url_for('user.change_avatar') }}" class="btn btn-primary btn-sm">
+                    <span class="oi oi-pencil"></span> 更换头像</a></p>
+            {% endif %}
+        </div>
+        <div class="col-sm-9">
+            <ul class="nav nav-tabs" role="tablist">
+                {{ render_nav_item('user.index', '发表的主题', user.publish_topic_count(), username=user.username) }}
+                {{ render_nav_item('user.my_posts', '回复的帖子', user.publish_post_count(), username=user.username) }}
+                {% if user == current_user %}
+                    {{ render_nav_item('user.collection', '我的收藏', current_user.collections|length) }}
+                    {{ render_nav_item('user.topics_noticed', '订阅的主题', current_user.notices|length) }}
+                    {{ render_nav_item('user.draft_post', '草稿--帖子', current_user.saved_post_count() )}}
+                    {{ render_nav_item('user.draft_topic', '草稿--主题', current_user.saved_topic_count() )}}
+                {% endif %}
+            </ul>
+            {% block user_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

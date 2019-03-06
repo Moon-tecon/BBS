@@ -1,0 +1,45 @@
+{% extends 'tecon/base.html' %}
+{% from 'tecon/macros.html' import news_card with context %}
+
+{% block title %}泰科{% endblock %}
+
+{% block img %}
+    <img src="{{ url_for('static', filename='imgs/home.jpg') }}">
+{% endblock %}
+
+{% block content %}
+    <h2 class="float-left">产业布局</h2>
+    <h4 class="text-muted">Industrial Layout</h4>
+    <hr class="up-10">
+    <div class="row">
+    {% for product in products %}
+        <div class="col-sm-4 little-thumbnail">
+            <a href="{{ url_for('tecon.show_item', item_id=product.id) }}">
+                <img src="{{ url_for('tecon.get_image', filename=product.photo.filename_s) }}"
+                     alt="{{ product.name }}"></a>
+        </div>
+    {% endfor %}
+    </div>
+    <h2 class="float-left">关于我们</h2>
+    <h4 class="text-muted strong">Abort Us</h4>
+    <hr class="up-10">
+    <div class="row">
+    {% for intro in introduces %}
+        <div class="col-sm-4 little-thumbnail">
+            <a href="{{ url_for('tecon.show_item', item_id=intro.id) }}">
+                <img src="{{ url_for('tecon.get_image', filename=intro.photo.filename_s) }}" alt="{{ intro.name }}">
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+    <h2 class="float-left">新闻中心</h2>
+    <h4 class="text-muted">News</h4>
+    <hr class="up-10">
+    <div class="row">
+        {% for news in newses %}
+            <div class="col-sm-4">
+                {{ news_card(news) }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

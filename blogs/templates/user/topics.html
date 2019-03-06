@@ -1,0 +1,61 @@
+{% extends 'user/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}{{ user.username }}的主页{% endblock %}
+
+{% block user_content %}
+    {% if topics %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th>组</th>
+                <th><span class="oi oi-chat"></span> </th>
+                <th><span class="oi oi-eye"></span> </th>
+                <th><span class="oi oi-envelope-closed"></span> </th>
+                <th><span class="oi oi-clock"></span></th>
+                {% if user==current_user or current_user.can('MODERATE') %}
+                    <th><span class="oi oi-wrench"></span> </th>{% endif %}
+            </tr>
+            </thead>
+            {% for topic in topics %}
+                <tr>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=topic.id) }}">{{ topic.name }}</a><br>
+                        <small class="text-muted"> {{ moment(topic.timestamp).format('llll') }}</small>
+                    </td>
+                    <td><a href="{{ url_for('main.show_group', group_id=topic.group_id) }}">
+                        {{ topic.group.name }}</a></td>
+                    <td>{{ topic.get_post_count() }}</td>
+                    <td>{{ topic.read_time }}</td>
+                    <td>{{ topic.receivers|length }}</td>
+                    <td class="text-muted">
+                        {% if topic.get_last_post() %}
+                            由<a class="profile-popover"
+                               data-href="{{ url_for('ajax.get_profile', user_id=topic.get_last_post().author_id) }}"
+                                    href="{{ url_for('user.index', username=topic.get_last_post().author.username) }}">
+                                {{ topic.get_last_post().author.username }}</a>发布<br>
+                            {{ topic.get_last_post().title }}<br>
+                            {{ moment(topic.get_last_post().timestamp).format('llll')}}
+                        {% else %}
+                            {{ moment(topic.timestamp).format('llll')}}
+                        {% endif %}
+                    </td>
+                    {% if user==current_user or current_user.can('MODERATE') %}<td>
+                        <a data-toggle="modal" data-target="#confirm-delete" href="#!"
+                           data-href="{{ url_for('main.delete_topic', topic_id=topic.id, next=request.full_path) }}"
+                            class="btn btn-sm btn-outline-danger"><span class="oi oi-x"></span> 删除</a>
+                        <a href="{{ url_for('main.edit_topic', topic_id=topic.id) }}"
+                           class="btn btn-sm btn-outline-primary"><span class="oi oi-pencil"></span> 编辑</a>
+                    </td>{% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% else %}
+        <div class="tip text-center">
+            <p class="text-muted">暂无内容</p>
+        </div>
+    {% endif %}
+{% endblock %}

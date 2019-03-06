@@ -1,0 +1,50 @@
+{% extends 'tecon/base.html' %}
+
+{% block title %}后台管理{% endblock %}
+
+{% block content %}
+    <div class="page-footer">
+        <a href="{{ url_for('tecon.new_item') }}" class="btn btn-outline-success float-right">新增项目</a>
+        <h1>后台管理</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-folder">新闻</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ news_count }}</h4>
+                    <a href="{{ url_for('tecon.manage_list', filter='news') }}" class="btn btn-primary text-white">管理</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-primary mb-3">
+                <div class="card-header"><span class="oi oi-people">关于我们</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ intro_count }}</h4>
+                    <a href="{{ url_for('tecon.manage_list', filter='intro') }}" class="btn btn-primary text-white">管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-document">产品布局</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ product_count }}</h4>
+                    <a href="{{ url_for('tecon.manage_list', filter='product') }}" class="btn btn-primary text-white">管理</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-document">草稿</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ draft_count }}</h4>
+                    <a href="{{ url_for('tecon.manage_list', filter='draft') }}" class="btn btn-primary text-white">管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

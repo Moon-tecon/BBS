@@ -1,0 +1,18 @@
+{% extends 'tecon/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}新增项目{% endblock %}
+
+{% block content %}
+    <div class="card w-100 bg-light">
+        <h4 class="card-header">新增项目</h4>
+        <div class="card-body">
+            {{ render_form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+{% endblock %}

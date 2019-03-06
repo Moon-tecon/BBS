@@ -1,0 +1,43 @@
+.news-card {
+    float: left;
+    width: 33.333%;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    border: 0;
+}
+
+.large_photo {
+    width: 100%;
+}
+
+.inline {
+    display: inline;
+}
+
+.list-table {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.page-footer {
+    margin-top: 30px;
+}
+
+.up-10 {
+    position: relative;
+    top: -10px;
+}
+
+.photo-thumbnail {
+    height: 200px;
+    overflow: hidden;
+}
+
+.little-thumbnail {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.table-auto {
+    margin: auto;
+}

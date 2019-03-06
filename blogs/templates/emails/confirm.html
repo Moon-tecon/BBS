@@ -1,0 +1,4 @@
+<p>管理员,你好：</p>
+<p>{{ user.username }} 申请加入我们公司的论坛<br>
+    进入<a href="{{ url_for('admin.manage_user', filter='unconfirm', _external=True) }}">用户申请管理</a>
+</p>

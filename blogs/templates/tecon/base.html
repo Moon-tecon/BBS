@@ -1,0 +1,143 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block head %}
+        <title>{% block title %}{% endblock %} - Tecon</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/tecon.css') }}">
+        {% endblock styles %}
+    {% endblock head %}
+</head>
+<body>
+
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('tecon.index') }}">
+                <img src="{{ url_for('static', filename='favicon.ico') }}" alt="Tecon">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <div class="navbar-nav mr-auto">
+                    {{ render_nav_item('tecon.index', '主页') }}
+                </div>
+                <div class="navbar-nav mr-auto">
+                    <div class="dropdown nav-item">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-expanded="false">
+                            关于我们<span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" role="menu">
+                            {% for item in introduces  %}
+                                <a class="dropdown-item" href="{{ url_for('tecon.show_item', item_id=item.id )}}">
+                                    {{ item.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-nav mr-auto">
+                    <div class="dropdown nav-item">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-expanded="false">
+                            产品布局<span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu" role="menu">
+                            {% for item in products  %}
+                                <a class="dropdown-item" href="{{ url_for('tecon.show_item', item_id=item.id )}}">
+                                    {{ item.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-nav mr-auto">
+                    {{ render_nav_item('tecon.show_newses', '新闻中心')}}
+                </div>
+                {% if current_user.can('PUBLICITY') %}
+                    <div class="navbar-nav ml-auto">
+                        <a class="nav-item" href="{{ url_for('tecon.manage')}}">
+                            <span class="oi oi-dashboard text-light"></span></a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+<main>
+    {% block img %}{% endblock %}
+    <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ message[0] }}">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1] }}
+            </div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+        <div class="row bg-light page-footer">
+            <div class="col-sm-7 table-auto">
+                <table class="table inline list-table">
+                    <tr><th><h4>关于我们</h4></th></tr>
+                    {% for item in introduces %}
+                        <tr>
+                            <td><a href="{{ url_for('tecon.show_item', item_id=item.id )}}" class="text-dark">
+                                <h6>{{ item.name }}</h6></a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <table class="table inline list-table">
+                    <tr><th><h4>产品布局</h4></th></tr>
+                    {% for item in products %}
+                        <tr>
+                            <td><a href="{{ url_for('tecon.show_item', item_id=item.id )}}" class="text-dark">
+                                <h6>{{ item.name }}</h6></a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <table class="table inline list-table"><tr><th>
+                    <a href="{{ url_for('tecon.show_newses')}}" class="text-dark"><h4>新闻中心</h4></a>
+                </th></tr></table>
+            </div>
+            <div class="col-sm-5">
+                <img alt="Tecon Logo" src="{{ url_for('static', filename='imgs/logo.png') }}" height="300px">
+            </div>
+        </div>
+        <footer>
+            <p class="float-left">
+                <small> &copy; Tecon 深圳泰科晶显科技有限公司</small>
+            </p>
+            <p class="float-right text-white">
+                <small>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.logout', next=request.full_path) }}">退出</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login', next=request.full_path) }}">登录</a>
+                    {% endif %}
+                </small>
+            </p>
+        </footer>
+    </div>
+</main>
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+    {{ moment.locale('zh-cn') }}
+    <script src="{{ url_for('static', filename='js/tecon.js') }}"></script>
+{% endblock %}
+
+</body>
+</html>

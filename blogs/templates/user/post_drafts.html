@@ -1,0 +1,36 @@
+{% extends 'user/basic.html' %}
+
+{% block title %}草稿管理{% endblock %}
+
+{% block user_content %}
+    {% if drafts %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th>保存于</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            {% for draft in drafts %}
+                <tr>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=draft.topic_id) }}">
+                        {{ draft.topic.name }}</a></td>
+                    <td class="text-muted">
+                        <a href="{{ url_for('main.edit_post', post_id=draft.id) }}">{{ draft.title }}</a><br>
+                        {{ moment(draft.timestamp).format('llll')}}</td>
+                    <td><a href="{{ url_for('main.edit_post', post_id=draft.id) }}"
+                                class="btn btn-outline-primary">编辑草稿</a>&nbsp;&nbsp;
+                        <button data-toggle="modal" data-target="#confirm-delete" href="#!"
+                           data-href="{{ url_for('main.delete_post', post_id=draft.id, next=request.full_path) }}"
+                            class="btn btn-outline-danger inline">删除</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="tip text-center">
+            <p class="text-muted">暂无内容</p>
+        </div>
+    {% endif %}
+{% endblock %}

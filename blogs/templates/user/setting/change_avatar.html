@@ -1,0 +1,37 @@
+{% extends 'user/setting/base.html' %}
+
+{% block title %}修改头像{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='jcrop/css/jquery.Jcrop.min.css') }}">
+{% endblock %}
+
+{% block setting_content %}
+    <div class="card w-100 bg-light">
+        <h3 class="card-header">更换头像</h3>
+        <div class="card-body">
+            <form action="{{ url_for('.upload_avatar') }}" method="post" enctype="multipart/form-data">
+                {{ upload_form.csrf_token }}
+                {{ render_field(upload_form.upload) }}
+                {{ render_field(upload_form.submit, class='btn btn-success')}}
+            </form>
+            <small class="text-muted">你的图片必须小于3M，且仅允许png和jpg格式图片。</small>
+        </div>
+        {% if current_user.avatar_raw %}
+            <div class="card-body">
+                {{ avatars.crop_box('main.get_avatar', current_user.avatar_raw) }}
+                {{ avatars.preview_box('main.get_avatar', current_user.avatar_raw) }}
+            </div>
+            <div class="card-body">
+                {{ render_form(crop_form, action=url_for('.crop_avatar')) }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='jcrop/js/jquery.Jcrop.min.js') }}"></script>
+    {{ avatars.init_jcrop() }}
+{% endblock %}

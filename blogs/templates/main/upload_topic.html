@@ -1,0 +1,45 @@
+{% extends'main/basic.html' %}
+
+{% block title %}上传附件{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dropzone.min.css') }}" type="text/css">
+    {{ dropzone.style('margin: 20px 0; border: 2px dashed #0087F7; min-height: 400px;') }}
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <p><span class="oi oi-home text-muted"></span>
+            <a href="{{ url_for('main.index')}}" class="text-dark text-muted">论坛首页</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_group', group_id=topic.group_id) }}" class="text-dark text-muted">
+                {{ topic.group.name }}</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_topic', topic_id=topic.id) }}" class="text-dark text-muted">
+                {{ topic.name }}</a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block base_content %}
+    <div class="card w-100 bg-light">
+        <h4 class="card-header">上传附件({{ topic.name }})</h4>
+        <div class="card-body">
+            {{ dropzone.create(action= url_for('main.upload_topic', topic_id=topic.id)) }}
+            <form action="{{ url_for('main.publish_topic', topic_id=topic.id) }}" method="post" class="float-right">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-outline-success">发布</button>
+            </form>
+            <a class="btn btn-outline-secondary float-right" href="{{ url_for('main.edit_topic', topic_id=topic.id) }}">
+                返回
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+    {{ dropzone.config() }}
+{% endblock %}

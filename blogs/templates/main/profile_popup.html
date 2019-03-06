@@ -1,0 +1,23 @@
+<div class="popup-card">
+    <img class="avatar-m float-left" src="{{ url_for('main.get_avatar', filename=user.avatar_m) }}">
+    <div class="popup-profile">
+        <h6>{{ user.username }}
+            {% if user.name and current_user.can('MEMBER')%}
+                ({{ user.name }})
+            {% endif %}
+        </h6>
+        <p class="text-muted">
+            {% if user.position and current_user.can('MEMBER') %}{{ user.position }}{% endif %}
+            {% if user.company and current_user.can('MEMBER') %}{{ user.company }}{% endif %}
+        </p>
+    </div>
+    <p>
+        帖子<a href="{{ url_for('user.index', username=user.username) }}" class="badge badge-info">
+        {{user.publish_topic_count()}}
+        </a><br>
+        {% if user.phone and current_user.can('MEMBER') %}电话：{{ user.phone }}<br>{% endif %}
+        邮箱：<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+    </p>
+    <a href="{{ url_for('user.index', username=user.username) }}" class="btn btn-info btn-sm">
+        <span class="oi oi-home"></span> {{ user.username }}的主页</a>
+</div>

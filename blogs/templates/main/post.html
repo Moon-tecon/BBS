@@ -1,0 +1,23 @@
+{% extends 'main/basic.html' %}
+{% from 'macros.html' import file_display with context %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <p><span class="oi oi-home text-muted"></span>
+            <a href="{{ url_for('main.index')}}" class="text-dark text-muted">论坛首页</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_group', group_id=post.topic.group_id) }}" class="text-dark text-muted">
+                {{ post.topic.group.name }}</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_topic', topic_id=post.topic_id) }}" class="text-dark text-muted">
+                {{ post.topic.name }}</a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block base_content %}
+    {% include 'main/_post.html' %}
+{% endblock %}

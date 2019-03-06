@@ -1,0 +1,23 @@
+{% extends 'tecon/base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'tecon/macros.html' import news_card with context %}
+
+{% block title %}新闻中心{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">新闻中心</h1>
+    {% if newses %}
+        <div class="row">
+            {% for news in newses %}
+                <div class="col-sm-4">
+                    {{ news_card(news) }}
+                </div>
+            {% endfor %}
+        </div>
+        {{ render_pagination(pagination) }}
+    {% else %}
+        <div class="tip">
+            还没有新闻
+        </div>
+    {% endif %}
+{% endblock %}

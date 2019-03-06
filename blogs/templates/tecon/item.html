@@ -1,0 +1,41 @@
+{% extends 'tecon/base.html' %}
+
+{% block title %} {{ item.name }}{% endblock %}
+
+{% block img %}
+<a href="{% if current_user.can('PUBLICITY') %}{{ url_for('tecon.upload', item_id=item.id)}}{% else %}#{% endif %}">
+    <img src="{{ url_for('tecon.get_image', filename=item.photo.filename)}}" class="large_photo"></a>
+{% endblock %}
+
+{% block content %}
+    <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target=".introLinkModal">
+        分享</button>
+    {% if current_user.can('PUBLICITY') %}
+        <a href="{{ url_for('tecon.edit_item', item_id=item.id)}}" class="float-right btn btn-success btn-sm">编辑</a>
+    {% endif %}
+    <h3 class="text-center">{{ item.name }}</h3>
+    {% if item.series_id == 3 %}
+        <p class="float-right text-muted">{{ moment(item.timestamp).format('LLL')}}</p>
+    {% endif %}
+    <br>
+    {{ item.body|safe }}
+    <div class="modal fade introLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                 aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mySmallModalLabel">链接地址</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" value="{{ url_for('tecon.show_item',
+                            item_id=item.id, _external=True) }}" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{{user.name}}您好：
+    您已被加入Tecon论坛，请点击下方网址进入论坛：
+    {{url_for('auth.login',  _external=True)}}
+
+(请不要回复此通知邮件）

@@ -1,0 +1,17 @@
+{% extends 'tecon/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %} {{ item.name }}{% endblock %}
+
+{% block content %}
+    {% if item.photo %}
+        <img src="{{ url_for('tecon.get_image', filename=item.photo.filename)}}" class="large_photo">
+    {% endif %}
+    <div class="card w-100 bg-light">
+        <h4 class="card-header">上传图片</h4>
+        <div class="card-body">
+            {{ render_form(form, extra_classes='col-6') }}
+            <small class="text-muted">你的图片必须小于3M，且仅允许jpg、jpeg、png和gif格式图片。</small>
+        </div>
+    </div>
+{% endblock %}

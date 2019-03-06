@@ -1,0 +1,57 @@
+{% extends'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}小组管理{% endblock %}
+
+{% block admin_content %}
+    <h1>小组管理</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr class="bg-primary text-white">
+            <th>组名</th>
+            <th width="50%">简介</th>
+            <th>版主</th>
+            <th><span class="oi oi-book"></span> </th>
+            <th><span class="oi oi-wrench"></span></th>
+        </tr>
+        </thead>
+        {% for group in groups %}
+            <tr>
+                <td><a href="{{ url_for('main.show_group', group_id=group.id) }}">{{ group.name }}</a></td>
+                <td>{{ group.intro }}</td>
+                <td>{{ group.admin.username }}</td>
+                <td>{{ group.get_topic_count() }}</td>
+                <td><form action="{{ url_for('admin.delete_group', group_id=group.id, next=request.full_path) }}" method="post" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('确定删除此小组吗（删除后小组内的主题、帖子也会被删除）？')">删除</button>
+                    </form>
+                    <a data-toggle="modal" data-target="#migrate_form" href="#!"
+                       data-href="{{ url_for('admin.migrate_group', group_id=group.id) }}"
+                       class="btn btn-sm btn-outline-info">迁移</a>
+                    <a href="{{ url_for('admin.edit_group', group_id=group.id)}}"
+                       class="btn btn-outline-secondary btn-sm">编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <!--migrate_form-->
+    <div class="modal fade" id="migrate_form" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>迁移组内主题</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" class="migrate_form" method="post">
+                        {{ form.csrf_token }}
+                        {{ render_field(form.group) }}
+                        {{ render_field(form.submit, class='btn btn-info float-right') }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

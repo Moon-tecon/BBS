@@ -1,0 +1,59 @@
+{% extends 'tecon/base.html' %}
+
+{% block title %}后台管理{% endblock %}
+
+{% block content %}
+    <div class="nav nav-pills" role="tablist">
+        <a class="nav-item nav-link {% if request.args.get('filter')=='news' %}active{% endif %}"
+           href="{{ url_for('tecon.manage_list', filter='news') }}">
+            新闻中心
+        </a>
+        <a class="nav-item nav-link {% if request.args.get('filter') == 'intro' %}active{% endif %}"
+           href="{{ url_for('tecon.manage_list', filter='intro') }}">
+            公司简介
+        </a>
+        <a class="nav-item nav-link {% if request.args.get('filter') == 'product' %}active{% endif %}"
+           href="{{ url_for('tecon.manage_list', filter='product') }}">
+            产品布局
+        </a>
+        <a class="nav-item nav-link {% if request.args.get('filter') == 'draft' %}active{% endif %}"
+           href="{{ url_for('tecon.manage_list', filter='draft') }}">
+            草稿
+        </a>
+    </div>
+    {% if series %}
+        <h3><strong>{{ series.name }}</strong>列表</h3>
+    {% else %}
+        <h3>草稿列表</h3>
+    {% endif %}
+    <table class="table">
+        <thead>
+        <tr class="bg-primary text-white">
+            <th width="20%">标题</th>
+            <th>图片</th>
+            <th width="50%">内容</th>
+            {% if request.args.get('filter')=='news' %}<th width="100%"><span class="oi oi-clock"></span></th>{% endif %}
+            <th><span class="oi oi-wrench"></span></th>
+        </tr>
+        </thead>
+        {% for item in items %}
+            <tr>
+                <td><a href="{{ url_for('tecon.show_item', item_id=item.id)}}">{{ item.name }}</a></td>
+                <td><a href="{{ url_for('tecon.upload', item_id=item.id)}}">
+                        <img src="{{ url_for('tecon.get_image', filename=item.photo.filename_s)}}"></a></td>
+                <td>{{ item.body|striptags|truncate(180,ture,'......') }}</td>
+                {% if request.args.get('filter')=='news' %}
+                    <td>{{ moment(item.timestamp).format('LLL') }}</td>
+                {% endif %}
+                <td><form action="{{ url_for('tecon.delete_item', item_id=item.id) }}" method="post" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('确定删除此项目吗？')">删除</button>
+                    </form>
+                    <a href="{{ url_for('tecon.edit_item', item_id=item.id)}}" class="btn btn-outline-primary btn-sm">
+                        编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

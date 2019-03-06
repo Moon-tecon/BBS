@@ -1,0 +1,57 @@
+{% extends'main/basic.html' %}
+{% from 'macros.html' import index_group with context %}
+
+{% block title %}泰科论坛{% endblock %}
+
+{% block base_content %}
+    {% if current_user.can('MEMBER') and member_groups %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th width="50%">内部区</th>
+                <th><span class="oi oi-book"></span> </th>
+                <th><span class="oi oi-chat"></span> </th>
+                <th class="text-center"><span class="oi oi-clock"></span></th>
+            </tr>
+            </thead>
+            {% for group in member_groups %}
+                {{ index_group(group) }}
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.confirmed %}
+        {% if limit_groups or groups %}
+            <table class="table">
+                <thead>
+                <tr class="card-header bg-primary text-white">
+                    <th width="50%">讨论区</th>
+                    <th><span class="oi oi-book"></span> </th>
+                    <th><span class="oi oi-chat"></span> </th>
+                    <th class="text-center"><span class="oi oi-clock"></span></th>
+                </tr>
+                </thead>
+                {% for group in limit_groups %}
+                     {{ index_group(group) }}
+                {% endfor %}
+                {% for group in groups %}
+                    {{ index_group(group) }}
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+    {% if all_groups %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th width="50%">游客区</th>
+                <th><span class="oi oi-book"></span> </th>
+                <th><span class="oi oi-chat"></span> </th>
+                <th class="text-center"><span class="oi oi-clock"></span></th>
+            </tr>
+            </thead>
+            {% for group in all_groups %}
+                {{ index_group(group) }}
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

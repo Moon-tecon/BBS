@@ -1,0 +1,49 @@
+{% extends 'user/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}{{ user.username }}发表的帖子{% endblock %}
+
+{% block user_content %}
+    {% if posts %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th>组</th>
+                <th><span class="oi oi-clock"></span></th>
+                {% if user == current_user or current_user.can('MODERATE') %}
+                    <th><span class="oi oi-wrench"></span></th>{% endif %}
+            </tr>
+            </thead>
+            {% for post in posts %}
+                <tr>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=post.topic_id) }}">{{ post.topic.name }}</a><br>
+                        由<a href="{{ url_for('user.index', username=post.topic.author.username) }}">
+                            {{ post.topic.author.username}}</a>
+                        </td>
+                    <td><a href="{{ url_for('main.show_group', group_id=post.topic.group_id) }}">
+                        {{ post.topic.group.name }}</a></td>
+                    <td class="text-muted">
+                        <a href="{{ url_for('main.show_post', post_id=post.id) }}" class="small text-dark">
+                            {{ post.title }}</a><br>
+                        {{ moment(post.timestamp).format('llll')}}</td>
+                    {% if user==current_user or current_user.can('MODERATE') %}<td>
+                        <a data-toggle="modal" data-target="#confirm-delete" href="#!"
+                           data-href="{{ url_for('main.delete_post', post_id=post.id, next=request.full_path) }}"
+                            class="btn btn-sm btn-outline-danger"><span class="oi oi-x"></span> 删除</a>&nbsp;&nbsp;
+                        <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-sm btn-outline-primary">
+                            <span class="oi oi-pencil">编辑</span>
+                        </a>
+                    </td>{% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% else %}
+        <div class="tip text-center">
+            <p class="text-muted">暂无内容</p>
+        </div>
+    {% endif %}
+{% endblock %}

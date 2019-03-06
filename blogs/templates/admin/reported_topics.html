@@ -1,0 +1,48 @@
+{% extends'admin/base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}被举报的主题管理{% endblock %}
+
+{% block admin_content %}
+    {% if topics %}
+        <table class="table table-striped">
+            <thead>
+            <tr class="bg-primary text-white">
+                <th>No.</th>
+                <th>标题</th>
+                <th>发布信息</th>
+                <th>次数</th>
+                <th><span class="oi oi-wrench"></span></th>
+            </tr>
+            </thead>
+            {% for topic in topics %}
+                <tr>
+                    <td>{{ loop.index + ((pagination.page - 1) * config['POST_PER_PAGE']) }}</td>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=topic.id) }}">{{ topic.name }}</a></td>
+                    <td>
+                        由<a href="{{url_for('user.index', username=topic.author.username)}}" class="profile-popover"
+                           data-href="{{ url_for('ajax.get_profile', user_id=topic.author_id) }}">
+                            {{ topic.author.username }}
+                        </a>发布<br>
+                        {{ moment(topic.timestamp).format('lll') }}
+                    </td>
+                    <td>{{ topic.report_time }}</td>
+                    <td>
+                        <form class="inline" method="post"
+                              action="{{ url_for('main.delete_topic', topic_id=topic.id, next=request.full_path) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirm('确定删除此主题吗？')">删除</button>
+                        </form>
+                        <form class="inline" method="post"
+                              action="{{ url_for('admin.reset_topic', topic_id=topic.id, next=request.full_path) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-outline-info btn-sm"
+                                    onclick="return confirm('确认清零吗？')">清零</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'user/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}我的收藏{% endblock %}
+
+{% block user_content %}
+    {% if collects %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th>组</th>
+                <th><span class="oi oi-chat"></span> </th>
+                <th><span class="oi oi-clock"></span></th>
+                <th><span class="oi oi-wrench"></span> </th>
+            </tr>
+            </thead>
+            {% for collect in collects %}
+                <tr>
+                    <td><a href="{{ url_for('main.show_topic', topic_id=collect.collected_id) }}">
+                        {{ collect.collected.name }}</a></td>
+                    <td><a href="{{ url_for('main.show_group', group_id=collect.collected.group_id) }}">
+                        {{ collect.collected.group.name }}</a> </td>
+                    <td>{{ collect.collected.get_post_count() }}</td>
+                    <td class="text-muted">
+                        {{ moment(collect.collected.timestamp).format('llll')}}<br>
+                        由<a href="{{ url_for('user.index', username=collect.collected.author.username)}}">
+                            {{ collect.collected.author.username }}
+                        </a> 发布
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('main.uncollect', topic_id=collect.collected_id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                <span class="oi oi-x"></span> 取消收藏
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% else %}
+        <div class="tip text-center">
+            <p class="text-muted">暂无内容</p>
+        </div>
+    {% endif %}
+{% endblock %}

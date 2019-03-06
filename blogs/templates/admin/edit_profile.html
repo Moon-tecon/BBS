@@ -1,0 +1,14 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}编辑{{ user.username }}信息{% endblock %}
+
+{% block admin_content %}
+    <div class="card w-100 bg-light">
+        <h3 class="card-header">编辑<strong>{{ user.username }}</strong>信息</h3>
+        <div class="card-body">
+            {{ render_form(form, extra_classes='col-6') }}
+        </div>
+        <small>带*为必填项</small>
+    </div>
+{% endblock %}

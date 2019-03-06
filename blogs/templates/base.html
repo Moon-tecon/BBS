@@ -1,0 +1,155 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block head %}
+        <title>{% block title %}{% endblock %} - BBS</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+        {% endblock styles %}
+    {% endblock head %}
+</head>
+<body>
+<!--{% block img %}
+    <a href="{{ url_for('main.index')}}">
+        <img src="{{ url_for('static', filename='imgs/home.jpg') }}">
+    </a>
+{% endblock %}-->
+
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <h3 class="text-blue">深圳泰科晶显科技有限公司</h3>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <div class="navbar-nav mr-auto">
+                    {{ render_nav_item('main.index', '论坛首页') }}
+                </div>
+                <div class="navbar-nav ml-auto">
+                    <form class="form-inline my-2 my-lg-0" action="{{ url_for('main.search') }}">
+                        <input type="text" name="q" class="form-control mr-sm-1" placeholder="请输入搜索关键字"
+                               required>
+                        <button class="btn btn-light my-2 my-sm-0 btn-sm" type="submit">
+                            <span class="oi oi-magnifying-glass"></span>
+                        </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </form>
+                    {% if current_user.is_authenticated %}
+                        <div class="dropdown nav-item">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <img class="avatar-xs"
+                                     src="{{ url_for('main.get_avatar', filename=current_user.avatar_s) }}">
+                                <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <h5 class="dropdown-header">{{ current_user.username }}</h5>
+                                <a class="dropdown-item" href="{{ url_for('user.index', username=current_user.username) }}">
+                                    <span class="oi oi-person"></span> 我的主页
+                                </a>
+                                {% if current_user.can('MODERATE') %}
+                                    <a class="dropdown-item" href="{{ url_for('admin.index', filter='confirmed') }}">
+                                        <span class="oi oi-dashboard"></span> 管理员主页
+                                    </a>
+                                {% endif %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
+                                    <span class="oi oi-cog"></span> 设置
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <span class="oi oi-power-standby"></span> 退出
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}">
+                            <span class="oi oi-power-standby text-dark">登录</span>
+                        </a>&nbsp;&nbsp;
+                        <a href="{{ url_for('auth.register') }}">
+                            <span class="oi oi-pencil text-dark">注册</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+<main>
+    <div class="container">
+        {% block header %}{% endblock %}
+        {% for message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ message[0] }}">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1] }}
+            </div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+        <!-- delete confirm modal -->
+        {% if current_user.is_authenticated %}
+            <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>确认删除这项吗？</p>
+                        </div>
+                        <div class="modal-footer">
+                            <form class="delete-form" action="" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button class="btn btn-danger btn-confirm" type="submit">删除</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% block footer %}
+            <div class="page-footer" id="bottom"></div>
+            <footer>
+                <p class="float-left">
+                    <small>
+                        <a href="http://120.78.128.55/tecon" title="Tecon">深圳泰科晶显科技有限公司</a>
+                    </small>
+                </p>
+                <p class="float-right">
+                    <small>Enjoy every wonderful moment.</small>
+                </p>
+            </footer>
+        {% endblock %}
+    </div>
+</main>
+<div id="toast"></div>
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+    {{ moment.locale('zh-cn') }}
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+        {% if current_user.is_authenticated %}
+            var is_authenticated = true;
+        {% else %}
+            var is_authenticated = false;
+        {% endif %}
+    </script>
+{% endblock %}
+</body>
+</html>

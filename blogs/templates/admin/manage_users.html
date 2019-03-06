@@ -1,0 +1,86 @@
+{% extends'admin/base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}用户管理{% endblock %}
+
+{% block admin_content %}
+<div class="nav nav-tabs" role="tablist">
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'confirmed' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='confirmed') }}">
+        论坛用户
+    </a>
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'unconfirm' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='unconfirm') }}">
+        新申请用户
+    </a>
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'blocked' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='blocked') }}">
+        封禁用户
+    </a>
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'member' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='member') }}">
+        员工
+    </a>
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'moderator' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='moderator') }}">
+        协管员
+    </a>
+    <a class="nav-item nav-link {% if request.args.get('filter') == 'admin' %}active{% endif %}"
+       href="{{ url_for('admin.manage_user', filter='admin') }}">
+        管理员
+    </a>
+</div>
+<div class="page-header">
+    <h3>用户管理
+        <small class="text-muted"><small>总用户数：{{ pagination.total }}</small></small>
+        <span class="float-right"><a class="btn btn-outline-primary"
+                                     href="{{ url_for('admin.new_user') }}">添加用户</a></span>
+    </h3>
+</div>
+{% if users %}
+    <table class="table table-striped">
+        <thead>
+        <tr class="bg-primary text-white">
+            <th>序号</th>
+            <th>用户名</th>
+            <th>姓名</th>
+            <th>邮箱</th>
+            <th>公司</th>
+            <th>角色</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        {% for user in users %}
+            <tr>
+                <td>{{ loop.index + ((pagination.page - 1) * config['USERS_PER_PAGE']) }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.name }}</td>
+                <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                <td>{{ user.company }}</td>
+                <td>{{ user.role.name }}</td>
+                <td>
+                    <form class="inline" method="post"
+                          action="{{ url_for('.delete_user', username=user.username, next=request.full_path) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('确定删除此用户吗？')">删除</button>
+                    </form>
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.edit_profile_admin', username=user.username) }}"
+                           class="btn btn-outline-primary btn-sm">编辑</a>
+                    {% endif %}
+                    {% if request.args.get('filter') == 'unconfirm' %}
+                        <form class="inline" method="post"
+                              action="{{ url_for('admin.confirm', username=user.username, next=request.full_path) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-primary btn-sm"
+                                    onclick="return confirm('允许用户的加入吗？')">允许加入</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="page-footer">{{ render_pagination(pagination) }}</div>
+{% endif %}
+{% endblock %}

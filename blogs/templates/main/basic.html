@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-9">
+            {% block base_content %}{% endblock %}
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6>用户资料</h6>
+                </div>
+                {% if current_user.is_authenticated %}
+                    <div class="card-body">
+                        <a href="{{ url_for('user.index', username=current_user.username) }}">
+                            <img src="{{ url_for('main.get_avatar', filename=current_user.avatar_m) }}"
+                                 class="img-fluid float-left avatar-l">
+                        </a>
+                        <strong>{{ current_user.username }}</strong><br>
+                        <a href="{{ url_for('user.index', username=current_user.username) }}" class="text-dark">
+                            <span class="oi oi-home"></span>用户主页</a><br>
+                        <a href="{{ url_for('auth.logout') }}" class="text-dark"><span class="oi oi-power-standby">退出</span></a><br>
+                        <br class="clear_float">
+                        <hr>
+                        <span class="oi oi-file"></span>
+                        <a href="{{ url_for('user.index', username=current_user.username)}}" class="text-dark">查看我的帖子</a><br>
+                        <span class="oi oi-bell"></span>
+                        <span class="{% if notification_count == 0 %}hidden{% endif %} badge badge-danger
+                              badge-notification" id="notification-badge"
+                              data-href="{{ url_for('ajax.notifications_count') }}">{{ notification_count }}</span>
+                        <a href="{{ url_for('main.show_notifications', filter='unread') }}" class="text-dark">通知
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="card-body">
+                        <a href="{{ url_for('auth.login') }}"><span class="oi oi-power-standby"></span> 登录</a>
+                        <br>
+                        <br>
+                        <a href="{{ url_for('auth.register') }}"><span class="oi oi-pencil"></span> 注册</a>
+                    </div>
+                {% endif %}
+            </div>
+            <br>
+            <br>
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6>{{ group3.name }}</h6>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">{{ group3.intro }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% macro news_card(news) %}
+    <div class="card border-light">
+        <img src="{{ url_for('tecon.get_image', filename=news.photo.filename_s)}}" class="photo-thumbnail">
+        <h5 class="card-title"><a href="{{ url_for('tecon.show_item', item_id=news.id) }}">
+            {{ news.name }}</a></h5>
+        {% if current_user.can('PUBLICITY') %}
+            <div class="dropdown nav-item">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                   aria-expanded="false">
+                    <span class="oi oi-ellipses"></span>
+                </a>
+                <div class="dropdown-menu" role="menu">
+                    <a href="{{ url_for('tecon.edit_item', item_id=news.id)}}" class="dropdown-item text-success">编辑</a>
+                    <form method="post" action="{{ url_for('tecon.delete_item', item_id=news.id)}}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="dropdown-item text-danger"
+                                onclick="return confirm('确定删除吗？')">删除</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+        <p class="card-text">{{ news.body|striptags|truncate(150,ture,'......') }}
+            <a href="{{ url_for('tecon.show_item', item_id=news.id) }}">查看更多</a>
+        </p>
+        <hr>
+        <p class="text-muted text-center">
+            <small>{{ moment(news.timestamp).format('LLL')}}</small>
+        </p>
+    </div>
+{% endmacro %}

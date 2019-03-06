@@ -1,0 +1,99 @@
+{% extends 'main/basic.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <p><span class="oi oi-home text-muted"></span>
+            <a href="{{ url_for('main.index')}}" class="text-dark text-muted">论坛首页</a>&nbsp;&nbsp;
+            <small class="oi oi-chevron-left text-muted"></small>&nbsp;
+            <a href="{{ url_for('main.show_group', group_id=group.id) }}" class="text-dark text-muted">
+                {{ group.name }}</a>
+        </p>
+    </div>
+{% endblock %}
+
+{% block base_content %}
+    <h1>{{ group.name }}</h1>
+    <div class="page-header">
+        <span class="float-right">
+            主题:<span class="badge badge-info">{{ group.get_topic_count() }}</span>
+        </span>
+        {% if group.status_id !=2 or current_user.can('MEMBER') %}
+            <a href="{{ url_for('main.new_topic', group_id=group.id) }}"
+               class="btn btn-primary {% if group.id == 3%}disabled{% endif %}" role="button">
+                发帖<span class="oi oi-pencil"></span> </a>
+        {% endif %}
+    </div>
+    {% if group.get_topic_count() %}
+        <table class="table">
+            <thead>
+            <tr class="card-header bg-primary text-white">
+                <th>主题</th>
+                <th><span class="oi oi-chat"></span> </th>
+                <th><span class="oi oi-eye"></span> </th>
+                <th><span class="oi oi-clock"></span></th>
+            </tr>
+            </thead>
+            {% for topic in group.top_topic() %}
+                <tr>
+                    <td><small class="badge badge-danger">置顶</small>
+                        {% if current_user.is_authenticated and not current_user.is_reading(topic) %}
+                            <small class="oi oi-media-record text-danger"></small>
+                        {% endif %}
+                        <a href="{{ url_for('main.show_topic', topic_id=topic.id) }}">
+                        {{ topic.name }}</a><br>
+                        <small>由
+                            <a href="{{ url_for('user.index', username=topic.author.username) }}">
+                                {{ topic.author.username }}</a></small>
+                    </td>
+                    <td>{{ topic.get_post_count() }}</td>
+                    <td>{{ topic.read_time }}</td>
+                    <td class="text-muted">
+                        {% if not topic.posts %}
+                            由<a class="profile-popover" href="{{ url_for('user.index', username=topic.author.username) }}"
+                                data-href="{{ url_for('ajax.get_profile', user_id=topic.author_id) }}">
+                            {{ topic.author.username }}</a>发布<br>
+                            {{ moment(topic.timestamp).format('llll')}}
+                        {% else %}
+                            由<a class="profile-popover"
+                               data-href="{{ url_for('ajax.get_profile', user_id=topic.get_last_post().author_id) }}"
+                                    href="{{ url_for('user.index', username=topic.get_last_post().author.username) }}">
+                                {{ topic.get_last_post().author.username }}</a>发布<br>
+                            {{ moment(topic.get_last_post().timestamp).format('llll')}}</td>
+                        {% endif %}
+                </tr>
+            {% endfor %}
+            {% for topic in topics %}
+                <tr>
+                    <td>{% if current_user.is_authenticated and not current_user.is_reading(topic) %}
+                            <small class="oi oi-media-record text-danger"></small>
+                        {% endif %}
+                        <a href="{{ url_for('main.show_topic', topic_id=topic.id) }}">
+                        {{ topic.name }}</a><br>
+                        <small>由
+                            <a href="{{ url_for('user.index', username=topic.author.username) }}">
+                                {{ topic.author.username }}</a></small>
+                    </td>
+                    <td>{{ topic.get_post_count() }}</td>
+                    <td>{{ topic.read_time }}</td>
+                    <td class="text-muted">
+                        {% if not topic.get_last_post() %}
+                            由<a class="profile-popover" href="{{ url_for('user.index', username=topic.author.username) }}"
+                                data-href="{{ url_for('ajax.get_profile', user_id=topic.author_id) }}">
+                            {{ topic.author.username }}</a>发布<br>
+                            {{ moment(topic.timestamp).format('llll')}}
+                        {% else %}
+                            由<a class="profile-popover"
+                               data-href="{{ url_for('ajax.get_profile', user_id=topic.get_last_post().author_id) }}"
+                                    href="{{ url_for('user.index', username=topic.get_last_post().author.username) }}">
+                                {{ topic.get_last_post().author.username }}</a>发布<br>
+                            {{ moment(topic.get_last_post().timestamp).format('llll')}}</td>
+                        {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+        {{ render_pagination(pagination, align='center') }}
+    {% endif %}
+{% endblock %}

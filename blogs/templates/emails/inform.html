@@ -1,0 +1,7 @@
+<p>Hello {{ user.name }},</p>
+<p>您已被加入Tecon论坛<br>
+    登录<a href="{{ url_for('auth.login', _external=True)}}" class="btn">Tecon论坛</a><br>
+    <a href="{{ url_for('auth.login')}}" class="btn">{{ url_for('auth.login', _external=True) }}</a>
+</p>
+
+<small>(请不要回复此通知邮件）</small>

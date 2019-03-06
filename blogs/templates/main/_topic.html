@@ -1,0 +1,67 @@
+<div class="card-body border_grey">
+    <div class="row card-body-header">
+        <div class="col-sm-4">
+            <a href="{{ url_for('user.index', username=topic.author.username) }}">
+                <img src="{{ url_for('main.get_avatar', filename=topic.author.avatar_s) }}"
+                     class="avatar-m profile-popover float-left img-fluid"
+                    data-href="{{ url_for('ajax.get_profile', user_id=topic.author.id) }}">
+            </a>
+            <a href="{{ url_for('user.index', username=topic.author.username) }}" class="profile-popover"
+                data-href="{{ url_for('ajax.get_profile', user_id=topic.author.id) }}">
+                {{ topic.author.username}}</a><br>
+            <small class="text-muted">
+            主题<a href="{{ url_for('user.index', username=topic.author.username) }}">
+                <span class="badge badge-info">
+                    {{ topic.author.publish_topic_count() }}
+                </span></a></small>
+        </div>
+        <div class="col-sm-4">
+            {% if topic.group.status_id !=2 or current_user.can('MEMBER')%}
+            <div class="dropdown nav-item float-left">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                   aria-expanded="false">
+                    <span class="oi oi-ellipses"></span>
+                </a>
+                <div class="dropdown-menu" role="menu">
+                    <a href="{{ url_for('main.new_post', topic_id=topic.id)}}" class="dropdown-item">
+                        <span class="oi oi-share"></span>回复</a>
+                    {% if current_user == topic.author or current_user == topic.group.admin
+                        or current_user.can('MODERATE') %}
+                        <a href="{{ url_for('main.edit_topic', topic_id=topic.id) }}" class="dropdown-item text-muted">
+                            <span class="oi oi-pencil">编辑</span>
+                        </a>
+                    {% endif %}
+                    {% if current_user.can('MEMBER') %}
+                        <form method="post" action="{{ url_for('main.report_topic', topic_id=topic.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="dropdown-item text-warning">
+                                <span class="oi oi-warning"></span>举报
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if current_user==topic.group.admin or current_user.can('MODERATE') or
+                        current_user==topic.author %}
+                        <a data-toggle="modal" data-target="#confirm-delete" href="#!"
+                           data-href="{{ url_for('main.delete_topic', topic_id=topic.id,
+                           next=url_for('main.show_group', group_id=topic.group_id)) }}"
+                            class="dropdown-item text-danger"><span class="oi oi-x"></span> 删除</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <span class="oi oi-clock text-muted small float-right">
+                {{ moment(topic.timestamp).format('llll') }}</span>
+        </div>
+    </div>
+    <div class="overflow">{{ topic.body|safe }}</div>
+    {% if topic.files %}
+        <div class="border border-light">
+            <h4>附件：</h4>
+            {% for file in topic.files %}
+                {{ file_display(file)}}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,22 @@
+{% extends 'tecon/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}编辑{{ item.name }}{% endblock %}
+
+{% block content %}
+    <div class="card w-100 bg-light">
+        <h4 class="card-header">编辑{{ item.name }}</h4>
+        {% if item.photo %}
+            <a href="{{ url_for('tecon.upload', item_id=item.id)}}">
+                <img src="{{ url_for('tecon.get_image', filename=item.photo.filename)}}" class="large_photo"></a>
+        {% endif %}
+        <div class="card-body">
+            {{ render_form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+{% endblock %}

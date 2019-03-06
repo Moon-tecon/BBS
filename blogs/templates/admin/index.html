@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %} 管理员主页 {% endblock %}
+
+{% block content %}
+    <h1 class="page-header">管理员主页</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-folder">组</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ group_count }}</h4>
+                    <a href="{{ url_for('.manage_group') }}" class="btn btn-primary text-white">管理</a>
+                    <a href="{{ url_for('.new_group') }}" class="btn btn-secondary text-white">添加新组</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-primary mb-3">
+                <div class="card-header"><span class="oi oi-people">用户</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ user_count }}</h4>
+                    <p class="card-text">封禁数：{{ blocked_user_count }}&nbsp;&nbsp;&nbsp;&nbsp;
+                        未确认用户：{{ unconfirm_user_count }}
+                    </p>
+                    <a href="{{ url_for('.manage_user') }}" class="btn btn-primary text-white">管理</a>
+                    <a href="{{ url_for('.manage_user', filter='unconfirm')}}" class="btn btn-secondary text-white">
+                        未确认用户</a>
+                    <a href="{{ url_for('.manage_user', filter='blocked') }}" class="btn btn-secondary text-white">
+                        封禁用户
+                    </a>
+                    <a href="{{ url_for('admin.new_user')}}" class="btn btn-success text-white">添加用户</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-document">主题</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ topic_count }}</h4>
+                    <p class="card-text">被举报的主题数：{{ reported_topic_count|default('0') }}</p>
+                    <a href="{{ url_for('.reported_topics')}}" class="btn btn-primary text-white">管理被举报的主题</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-primary md-3">
+                <div class="card-header"><span class="oi oi-chat">帖子</span> </div>
+                <div class="card-body">
+                    <h4 class="card-title">总数：{{ post_count }}</h4>
+                    <p class="card-text">被举报的主题数：{{ reported_post_count|default('0') }}</p>
+                    <a href="{{ url_for('.reported_posts')}}" class="btn btn-primary text-white">管理被举报的帖子</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
